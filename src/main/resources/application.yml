@@ -29,7 +29,7 @@ spring:
 spring:
   config:
     activate:
-      on-profile: test
+      on-profile: prod
   datasource:
     url: ${DB_URL}
     username: postgres
