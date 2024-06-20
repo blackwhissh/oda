@@ -3,16 +3,16 @@ package com.startup.oda.service;
 
 import com.startup.oda.config.PasswordConfig;
 import com.startup.oda.dto.request.RegisterRequest;
+import com.startup.oda.dto.response.JwtResponse;
 import com.startup.oda.dto.response.MessageResponse;
-import com.startup.oda.entity.Agent;
-import com.startup.oda.entity.Client;
-import com.startup.oda.entity.Owner;
-import com.startup.oda.entity.User;
+import com.startup.oda.entity.*;
 import com.startup.oda.entity.enums.RoleEnum;
 import com.startup.oda.repository.AgentRepository;
 import com.startup.oda.repository.ClientRepository;
 import com.startup.oda.repository.OwnerRepository;
 import com.startup.oda.repository.UserRepository;
+import com.startup.oda.security.jwt.JwtUtils;
+import com.startup.oda.security.jwt.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,30 +24,26 @@ public class RegisterService {
     private final AgentRepository agentRepository;
     private final ClientRepository clientRepository;
     private final OwnerRepository ownerRepository;
+    private final RefreshTokenService refreshTokenService;
+    private final JwtUtils jwtUtils;
 
     @Autowired
     public RegisterService(UserRepository userRepository,
                            AgentRepository agentRepository,
                            ClientRepository clientRepository,
-                           OwnerRepository ownerRepository) {
+                           OwnerRepository ownerRepository, RefreshTokenService refreshTokenService, JwtUtils jwtUtils) {
         this.userRepository = userRepository;
         this.agentRepository = agentRepository;
         this.clientRepository = clientRepository;
         this.ownerRepository = ownerRepository;
+        this.refreshTokenService = refreshTokenService;
+        this.jwtUtils = jwtUtils;
     }
     public ResponseEntity<?> registerAgent(RegisterRequest request){
-        if(userRepository.existsByEmailAndIsActive(request.getEmail(), true)){
+        User user = createUser(request);
+        if(user == null){
             return ResponseEntity.badRequest().body(new MessageResponse("Email is already registered!"));
         }
-        User user = new User();
-
-        user.setPhone(request.getPhone());
-        user.setEmail(request.getEmail());
-        user.setPassword(PasswordConfig.passwordEncoder().encode(request.getPassword()));
-        user.setRole(RoleEnum.AGENT);
-        user.setActive(true);
-        user.setVerified(true);
-        userRepository.save(user);
 
         Agent agent = new Agent();
 
@@ -57,21 +53,22 @@ public class RegisterService {
 
         agentRepository.save(agent);
 
-        return ResponseEntity.ok().body(new MessageResponse("Agent registered successfully!"));
+        String accessToken = jwtUtils.generateJwtToken(request.getEmail(), RoleEnum.valueOf(request.getRole().toUpperCase()));
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.getEmail());
+        String role = "ROLE_" + user.getRole().toString();
+        return ResponseEntity.ok(new JwtResponse(
+                accessToken,
+                refreshToken.getToken(),
+                user.getUserId(),
+                request.getEmail(),
+                role
+        ));
     }
     public ResponseEntity<?> registerClient(RegisterRequest request){
-        if(userRepository.existsByEmailAndIsActive(request.getEmail(), true)){
+        User user = createUser(request);
+        if(user == null){
             return ResponseEntity.badRequest().body(new MessageResponse("Email is already registered!"));
         }
-        User user = new User();
-
-        user.setPhone(request.getPhone());
-        user.setEmail(request.getEmail());
-        user.setPassword(PasswordConfig.passwordEncoder().encode(request.getPassword()));
-        user.setRole(RoleEnum.CLIENT);
-        user.setActive(true);
-        user.setVerified(true);
-        userRepository.save(user);
 
         Client client = new Client();
 
@@ -80,22 +77,23 @@ public class RegisterService {
         client.setUser(user);
         clientRepository.save(client);
 
-        return ResponseEntity.ok().body(new MessageResponse("Client registered successfully!"));
+        String accessToken = jwtUtils.generateJwtToken(request.getEmail(), RoleEnum.valueOf(request.getRole().toUpperCase()));
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.getEmail());
+        String role = "ROLE_" + user.getRole().toString();
+        return ResponseEntity.ok(new JwtResponse(
+                accessToken,
+                refreshToken.getToken(),
+                user.getUserId(),
+                request.getEmail(),
+                role
+        ));
     }
 
     public ResponseEntity<?> registerOwner(RegisterRequest request){
-        if(userRepository.existsByEmailAndIsActive(request.getEmail(), true)){
+        User user = createUser(request);
+        if(user == null){
             return ResponseEntity.badRequest().body(new MessageResponse("Email is already registered!"));
         }
-        User user = new User();
-
-        user.setPhone(request.getPhone());
-        user.setEmail(request.getEmail());
-        user.setPassword(PasswordConfig.passwordEncoder().encode(request.getPassword()));
-        user.setRole(RoleEnum.OWNER);
-        user.setActive(true);
-        user.setVerified(true);
-        userRepository.save(user);
 
         Owner owner = new Owner();
 
@@ -104,6 +102,32 @@ public class RegisterService {
         owner.setUser(user);
         ownerRepository.save(owner);
 
-        return ResponseEntity.ok().body(new MessageResponse("Owner registered successfully!"));
+        String accessToken = jwtUtils.generateJwtToken(request.getEmail(), RoleEnum.valueOf(request.getRole().toUpperCase()));
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.getEmail());
+        String role = "ROLE_" + user.getRole().toString();
+        return ResponseEntity.ok(new JwtResponse(
+                accessToken,
+                refreshToken.getToken(),
+                user.getUserId(),
+                request.getEmail(),
+                role
+        ));
+    }
+
+    private User createUser(RegisterRequest request) {
+        if(userRepository.existsByEmailAndIsActive(request.getEmail(), true)){
+            return null;
+        }
+        User user = new User();
+
+        user.setPhone(request.getPhone());
+        user.setEmail(request.getEmail());
+        user.setPassword(PasswordConfig.passwordEncoder().encode(request.getPassword()));
+        user.setRole(RoleEnum.valueOf(request.getRole().toUpperCase()));
+        user.setActive(true);
+        user.setVerified(true);
+        userRepository.save(user);
+
+        return user;
     }
 }

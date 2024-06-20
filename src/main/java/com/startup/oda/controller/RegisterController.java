@@ -19,41 +19,21 @@ public class RegisterController {
     public RegisterController(RegisterService registerService) {
         this.registerService = registerService;
     }
-    @PostMapping("/client")
-    public ResponseEntity<?> registerClient(@RequestBody RegisterRequest registerRequest){
-        if (!validateRegisterRequest(registerRequest)){
-            throw new InvalidInputException();
-        }
-        return registerService.registerClient(registerRequest);
-    }
-    @PostMapping("/owner")
-    public ResponseEntity<?> registerOwner(@RequestBody RegisterRequest registerRequest){
-        if (!validateRegisterRequest(registerRequest)){
-            throw new InvalidInputException();
-        }
-        return registerService.registerOwner(registerRequest);
-    }
-    @PostMapping("/agent")
-    public ResponseEntity<?> registerAgent(@RequestBody RegisterRequest registerRequest){
-        if (!validateRegisterRequest(registerRequest)){
-            throw new InvalidInputException();
-        }
-        return registerService.registerAgent(registerRequest);
-    }
     @PostMapping()
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest){
         if (!validateRegisterRequest(registerRequest)){
             throw new InvalidInputException();
         }
-        RoleEnum role = registerRequest.getRoleEnum();
+        String role = registerRequest.getRole().toUpperCase();
+
         switch (role){
-            case AGENT -> {
+            case "AGENT" -> {
                 return registerService.registerAgent(registerRequest);
             }
-            case OWNER -> {
+            case "OWNER" -> {
                 return registerService.registerOwner(registerRequest);
             }
-            case CLIENT -> {
+            case "CLIENT" -> {
                 return registerService.registerClient(registerRequest);
             }
             default -> throw new WrongRoleException();
