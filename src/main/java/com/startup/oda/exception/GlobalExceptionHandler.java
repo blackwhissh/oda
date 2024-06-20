@@ -50,5 +50,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(WrongRoleException.class)
+    public ResponseEntity<Object> handleIWrongRoleException(WrongRoleException e) {
+        ExceptionResponse response = new ExceptionResponse();
+        response.setDateTime(LocalDateTime.now());
+        response.setMessage("Invalid role");
+        return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
+    }
+
 
 }

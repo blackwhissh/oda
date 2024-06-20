@@ -41,6 +41,7 @@ public class RegisterService {
         }
         User user = new User();
 
+        user.setPhone(request.getPhone());
         user.setEmail(request.getEmail());
         user.setPassword(PasswordConfig.passwordEncoder().encode(request.getPassword()));
         user.setRole(RoleEnum.AGENT);
@@ -64,6 +65,7 @@ public class RegisterService {
         }
         User user = new User();
 
+        user.setPhone(request.getPhone());
         user.setEmail(request.getEmail());
         user.setPassword(PasswordConfig.passwordEncoder().encode(request.getPassword()));
         user.setRole(RoleEnum.CLIENT);
@@ -87,6 +89,7 @@ public class RegisterService {
         }
         User user = new User();
 
+        user.setPhone(request.getPhone());
         user.setEmail(request.getEmail());
         user.setPassword(PasswordConfig.passwordEncoder().encode(request.getPassword()));
         user.setRole(RoleEnum.OWNER);

@@ -1,6 +1,6 @@
 spring:
   profiles:
-    default: dev
+    default: test
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -21,7 +21,7 @@ jwt:
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: test
   datasource:
     url: ${DB_URL_TEST}
 
@@ -29,11 +29,11 @@ spring:
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: dev
   datasource:
-    url: ${DB_URL}
-    username: postgres
-    password: 12345678
+    url: ${DB_URL_DEV}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

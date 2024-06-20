@@ -32,6 +32,8 @@ public class User {
     private List<Review> reviews = new ArrayList<>();
     @Column(name = "reg_date")
     private final LocalDate registrationDate = LocalDate.now();
+    @Column(name = "phone")
+    private String phone;
 
 
     public User() {
@@ -97,6 +99,14 @@ public class User {
         return registrationDate;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -108,6 +118,7 @@ public class User {
                 ", isVerified=" + isVerified +
                 ", reviews=" + reviews +
                 ", registrationDate=" + registrationDate +
+                ", phone='" + phone + '\'' +
                 '}';
     }
 }

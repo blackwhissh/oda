@@ -1,7 +1,9 @@
 package com.startup.oda.controller;
 
 import com.startup.oda.dto.request.RegisterRequest;
+import com.startup.oda.entity.enums.RoleEnum;
 import com.startup.oda.exception.exceptionsList.InvalidInputException;
+import com.startup.oda.exception.exceptionsList.WrongRoleException;
 import com.startup.oda.service.RegisterService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,5 +39,24 @@ public class RegisterController {
             throw new InvalidInputException();
         }
         return registerService.registerAgent(registerRequest);
+    }
+    @PostMapping()
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest){
+        if (!validateRegisterRequest(registerRequest)){
+            throw new InvalidInputException();
+        }
+        RoleEnum role = registerRequest.getRoleEnum();
+        switch (role){
+            case AGENT -> {
+                return registerService.registerAgent(registerRequest);
+            }
+            case OWNER -> {
+                return registerService.registerOwner(registerRequest);
+            }
+            case CLIENT -> {
+                return registerService.registerClient(registerRequest);
+            }
+            default -> throw new WrongRoleException();
+        }
     }
 }
