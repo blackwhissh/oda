@@ -29,11 +29,8 @@ public class JwtUtils {
         String jwtExpirationMs = "3600000";
         Instant expirationTime = now.plusMillis(Long.parseLong(jwtExpirationMs));
         Date expirationDate = Date.from(expirationTime);
-        HashMap<String, String> claims = new HashMap<>();
-        claims.put("role", role.toString());
         return Jwts.builder()
                 .setSubject(username)
-                .setClaims(claims)
                 .setIssuedAt(new Date())
                 .setExpiration(expirationDate)
                 .signWith(key(), SignatureAlgorithm.HS256)
