@@ -53,16 +53,17 @@ public class RegisterService {
 
         agentRepository.save(agent);
 
-        String accessToken = jwtUtils.generateJwtToken(request.getEmail(), RoleEnum.valueOf(request.getRole().toUpperCase()));
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.getEmail());
+//        String accessToken = jwtUtils.generateJwtToken(request.getEmail(), RoleEnum.valueOf(request.getRole().toUpperCase()));
+//        RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.getEmail());
         String role = "ROLE_" + user.getRole().toString();
-        return ResponseEntity.ok(new JwtResponse(
-                accessToken,
-                refreshToken.getToken(),
-                user.getUserId(),
-                request.getEmail(),
-                role
-        ));
+//        return ResponseEntity.ok(new JwtResponse(
+//                accessToken,
+//                refreshToken.getToken(),
+//                user.getUserId(),
+//                request.getEmail(),
+//                role
+//        ));
+        return ResponseEntity.ok().body("agent registered successfully");
     }
     public ResponseEntity<?> registerClient(RegisterRequest request){
         User user = createUser(request);

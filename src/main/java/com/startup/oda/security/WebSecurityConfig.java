@@ -21,7 +21,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
-@EnableMethodSecurity
 public class WebSecurityConfig {
     private final AuthEntryPointJwt unauthorizedHandler;
     private final ApplicationUserService applicationUserService;
@@ -46,7 +45,7 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/error", "/v1/api/auth/login",
-                                         "/v1/api/register/**",
+                                         "/v1/api/register",
                                         "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated()
                 );
