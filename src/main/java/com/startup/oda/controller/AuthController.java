@@ -1,5 +1,6 @@
 package com.startup.oda.controller;
 
+import com.startup.oda.config.LogEntryExit;
 import com.startup.oda.dto.request.SignInRequest;
 import com.startup.oda.dto.request.TokenRefreshRequest;
 import com.startup.oda.dto.response.JwtResponse;
@@ -38,6 +39,7 @@ public class AuthController {
         this.refreshTokenService = refreshTokenService;
     }
     @PostMapping("/login")
+    @LogEntryExit()
     public ResponseEntity<?> authenticateUser(@RequestBody SignInRequest signInRequest){
         User user = userRepository.findByEmail(signInRequest.getEmail())
                 .orElseThrow(UserNotFoundException::new);
@@ -65,6 +67,7 @@ public class AuthController {
         ));
     }
     @PostMapping("/refreshtoken")
+    @LogEntryExit()
     public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request){
         String requestRefreshToken = request.getRefreshToken();
 
@@ -78,6 +81,7 @@ public class AuthController {
                 .orElseThrow(RefreshTokenNotFoundException::new);
     }
     @PostMapping("/logout")
+    @LogEntryExit()
     public ResponseEntity<?> logoutUser() {
         User user = userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString())
                 .orElseThrow(UserNotFoundException::new);

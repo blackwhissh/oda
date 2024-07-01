@@ -13,6 +13,9 @@ import com.startup.oda.repository.OwnerRepository;
 import com.startup.oda.repository.UserRepository;
 import com.startup.oda.security.jwt.JwtUtils;
 import com.startup.oda.security.jwt.RefreshTokenService;
+import io.jsonwebtoken.JwtException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RegisterService {
+    private final static Logger log = LoggerFactory.getLogger(RegisterService.class);
     private final UserRepository userRepository;
     private final AgentRepository agentRepository;
     private final ClientRepository clientRepository;
@@ -53,17 +57,14 @@ public class RegisterService {
 
         agentRepository.save(agent);
 
-//        String accessToken = jwtUtils.generateJwtToken(request.getEmail(), RoleEnum.valueOf(request.getRole().toUpperCase()));
-//        RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.getEmail());
-        String role = "ROLE_" + user.getRole().toString();
-//        return ResponseEntity.ok(new JwtResponse(
-//                accessToken,
-//                refreshToken.getToken(),
-//                user.getUserId(),
-//                request.getEmail(),
-//                role
-//        ));
-        return ResponseEntity.ok().body("agent registered successfully");
+        try {
+            JwtResponse jwt = createJwt(request.getEmail(), request.getRole(), user.getUserId());
+            log.info("Created JWT for Agent");
+            return ResponseEntity.ok(jwt);
+        } catch (Exception e){
+            log.error("Error creating JWT for Agent");
+            throw new JwtException(e.getMessage());
+        }
     }
     public ResponseEntity<?> registerClient(RegisterRequest request){
         User user = createUser(request);
@@ -78,16 +79,14 @@ public class RegisterService {
         client.setUser(user);
         clientRepository.save(client);
 
-        String accessToken = jwtUtils.generateJwtToken(request.getEmail(), RoleEnum.valueOf(request.getRole().toUpperCase()));
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.getEmail());
-        String role = "ROLE_" + user.getRole().toString();
-        return ResponseEntity.ok(new JwtResponse(
-                accessToken,
-                refreshToken.getToken(),
-                user.getUserId(),
-                request.getEmail(),
-                role
-        ));
+        try {
+            JwtResponse jwt = createJwt(request.getEmail(), request.getRole(), user.getUserId());
+            log.info("Created JWT for Client");
+            return ResponseEntity.ok(jwt);
+        } catch (Exception e){
+            log.error("Error creating JWT for Client");
+            throw new JwtException(e.getMessage());
+        }
     }
 
     public ResponseEntity<?> registerOwner(RegisterRequest request){
@@ -103,16 +102,14 @@ public class RegisterService {
         owner.setUser(user);
         ownerRepository.save(owner);
 
-        String accessToken = jwtUtils.generateJwtToken(request.getEmail(), RoleEnum.valueOf(request.getRole().toUpperCase()));
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(request.getEmail());
-        String role = "ROLE_" + user.getRole().toString();
-        return ResponseEntity.ok(new JwtResponse(
-                accessToken,
-                refreshToken.getToken(),
-                user.getUserId(),
-                request.getEmail(),
-                role
-        ));
+        try {
+            JwtResponse jwt = createJwt(request.getEmail(), request.getRole(), user.getUserId());
+            log.info("Created JWT for Owner");
+            return ResponseEntity.ok(jwt);
+        } catch (Exception e){
+            log.error("Error creating JWT for Owner");
+            throw new JwtException(e.getMessage());
+        }
     }
 
     private User createUser(RegisterRequest request) {
@@ -130,5 +127,18 @@ public class RegisterService {
         userRepository.save(user);
 
         return user;
+    }
+
+    private JwtResponse createJwt(String email, String role, Long userId){
+        String accessToken = jwtUtils.generateJwtToken(email, RoleEnum.valueOf(role.toUpperCase()));
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(email);
+        String userRole = "ROLE_" + role.toUpperCase();
+        return new JwtResponse(
+                accessToken,
+                refreshToken.getToken(),
+                userId,
+                email,
+                userRole
+        );
     }
 }

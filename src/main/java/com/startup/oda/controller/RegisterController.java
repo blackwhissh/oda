@@ -1,5 +1,6 @@
 package com.startup.oda.controller;
 
+import com.startup.oda.config.LogEntryExit;
 import com.startup.oda.dto.request.RegisterRequest;
 import com.startup.oda.entity.enums.RoleEnum;
 import com.startup.oda.exception.exceptionsList.InvalidInputException;
@@ -20,6 +21,7 @@ public class RegisterController {
         this.registerService = registerService;
     }
     @PostMapping()
+    @LogEntryExit()
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest){
         if (!validateRegisterRequest(registerRequest)){
             throw new InvalidInputException();

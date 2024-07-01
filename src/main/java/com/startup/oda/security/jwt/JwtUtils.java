@@ -1,7 +1,6 @@
 package com.startup.oda.security.jwt;
 
 
-import com.startup.oda.dto.response.JwtResponse;
 import com.startup.oda.entity.enums.RoleEnum;
 import com.startup.oda.exception.exceptionsList.ActiveTokenRevokedException;
 import io.jsonwebtoken.*;
@@ -16,13 +15,12 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
-import java.util.HashMap;
 
 @Component
 public class JwtUtils {
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
     @Value("${jwt.key}")
     private String jwtSecret;
-    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
     public String generateJwtToken(String username, RoleEnum role) {
         Instant now = Instant.now();
@@ -36,11 +34,6 @@ public class JwtUtils {
                 .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();
     }
-
-    private Key key() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
-    }
-
     public String getUsernameFromJwtToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key()).build()
                 .parseClaimsJws(token).getBody().getSubject();
@@ -63,5 +56,8 @@ public class JwtUtils {
             logger.error("JWT claims string is empty: {}", e.getMessage());
         }
         return false;
+    }
+    private Key key() {
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 }
