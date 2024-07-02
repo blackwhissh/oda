@@ -90,4 +90,14 @@ public class AuthController {
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok(new MessageResponse("Log out successful!"));
     }
+
+    @GetMapping("/verify/{token}")
+    @LogEntryExit
+    public ResponseEntity<?> verify(@PathVariable(name = "token") String token){
+        if (jwtUtils.validateJwtToken(token)){
+            return ResponseEntity.ok("Email verified successfully");
+        }else {
+            return ResponseEntity.badRequest().body("Wrong token");
+        }
+    }
 }

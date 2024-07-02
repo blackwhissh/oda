@@ -11,6 +11,9 @@ spring:
   datasource:
     username: postgres
     password: 12345678
+  mail:
+    host: localhost
+    port: 25
 server:
   port: 8081
   error:

@@ -30,18 +30,20 @@ public class RegisterService {
     private final OwnerRepository ownerRepository;
     private final RefreshTokenService refreshTokenService;
     private final JwtUtils jwtUtils;
+    private final MailService mailService;
 
     @Autowired
     public RegisterService(UserRepository userRepository,
                            AgentRepository agentRepository,
                            ClientRepository clientRepository,
-                           OwnerRepository ownerRepository, RefreshTokenService refreshTokenService, JwtUtils jwtUtils) {
+                           OwnerRepository ownerRepository, RefreshTokenService refreshTokenService, JwtUtils jwtUtils, MailService mailService) {
         this.userRepository = userRepository;
         this.agentRepository = agentRepository;
         this.clientRepository = clientRepository;
         this.ownerRepository = ownerRepository;
         this.refreshTokenService = refreshTokenService;
         this.jwtUtils = jwtUtils;
+        this.mailService = mailService;
     }
     public ResponseEntity<?> registerAgent(RegisterRequest request){
         User user = createUser(request);
@@ -60,6 +62,7 @@ public class RegisterService {
         try {
             JwtResponse jwt = createJwt(request.getEmail(), request.getRole(), user.getUserId());
             log.info("Created JWT for Agent");
+            mailService.sendMail(request.getEmail(), jwt.getAccessToken());
             return ResponseEntity.ok(jwt);
         } catch (Exception e){
             log.error("Error creating JWT for Agent");
@@ -82,6 +85,7 @@ public class RegisterService {
         try {
             JwtResponse jwt = createJwt(request.getEmail(), request.getRole(), user.getUserId());
             log.info("Created JWT for Client");
+            mailService.sendMail(request.getEmail(), jwt.getAccessToken());
             return ResponseEntity.ok(jwt);
         } catch (Exception e){
             log.error("Error creating JWT for Client");
@@ -105,6 +109,7 @@ public class RegisterService {
         try {
             JwtResponse jwt = createJwt(request.getEmail(), request.getRole(), user.getUserId());
             log.info("Created JWT for Owner");
+            mailService.sendMail(request.getEmail(), jwt.getAccessToken());
             return ResponseEntity.ok(jwt);
         } catch (Exception e){
             log.error("Error creating JWT for Owner");

@@ -2,7 +2,7 @@ package com.startup.oda.controller;
 
 import com.startup.oda.config.LogEntryExit;
 import com.startup.oda.dto.request.RegisterRequest;
-import com.startup.oda.entity.enums.RoleEnum;
+
 import com.startup.oda.exception.exceptionsList.InvalidInputException;
 import com.startup.oda.exception.exceptionsList.WrongRoleException;
 import com.startup.oda.service.RegisterService;
