@@ -11,6 +11,7 @@ spring:
   datasource:
     username: postgres
     password: 12345678
+    driver-class-name: org.postgresql.Driver
   mail:
     host: localhost
     port: 25
@@ -27,7 +28,8 @@ spring:
       on-profile: test
   datasource:
     url: ${DB_URL_TEST}
-
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 ---
 spring:
   config:
@@ -46,7 +48,6 @@ spring:
         boot:
           allow_jdbc_metadata_access: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
 ---
 spring:
   profiles:

@@ -15,10 +15,6 @@ public class Agent {
     private Long agentId;
     @OneToOne
     private User user;
-    @Column(name = "first_name")
-    private String firstName;
-    @Column(name = "last_name")
-    private String lastName;
     @OneToMany(mappedBy = "agent",cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Request> requests = new ArrayList<>();
     @OneToMany(mappedBy = "agent",cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
@@ -43,22 +39,6 @@ public class Agent {
         this.user = user;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
     public List<Request> getRequests() {
         return requests;
     }
@@ -80,8 +60,6 @@ public class Agent {
         return "Agent{" +
                 "agentId=" + agentId +
                 ", user=" + user +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
                 ", requests=" + requests +
                 ", properties=" + properties +
                 '}';

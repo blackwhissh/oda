@@ -14,10 +14,6 @@ public class Owner {
     private Long clientId;
     @OneToOne
     private User user;
-    @Column(name = "first_name")
-    private String firstName;
-    @Column(name = "last_name")
-    private String lastName;
     @OneToMany(mappedBy = "owner",cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Property> properties = new ArrayList<>();
 
@@ -40,22 +36,6 @@ public class Owner {
         this.user = user;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
     public List<Property> getProperties() {
         return properties;
     }
@@ -69,8 +49,6 @@ public class Owner {
         return "Owner{" +
                 "clientId=" + clientId +
                 ", user=" + user +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
                 ", properties=" + properties +
                 '}';
     }

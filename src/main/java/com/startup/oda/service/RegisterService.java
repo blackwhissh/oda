@@ -53,8 +53,6 @@ public class RegisterService {
 
         Agent agent = new Agent();
 
-        agent.setFirstName(request.getFirstName());
-        agent.setLastName(request.getLastName());
         agent.setUser(user);
 
         agentRepository.save(agent);
@@ -76,9 +74,6 @@ public class RegisterService {
         }
 
         Client client = new Client();
-
-        client.setFirstName(request.getFirstName());
-        client.setLastName(request.getLastName());
         client.setUser(user);
         clientRepository.save(client);
 
@@ -100,9 +95,6 @@ public class RegisterService {
         }
 
         Owner owner = new Owner();
-
-        owner.setFirstName(request.getFirstName());
-        owner.setLastName(request.getLastName());
         owner.setUser(user);
         ownerRepository.save(owner);
 
@@ -123,6 +115,8 @@ public class RegisterService {
         }
         User user = new User();
 
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
         user.setPhone(request.getPhone());
         user.setEmail(request.getEmail());
         user.setPassword(PasswordConfig.passwordEncoder().encode(request.getPassword()));

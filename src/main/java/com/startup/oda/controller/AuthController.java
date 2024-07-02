@@ -45,7 +45,9 @@ public class AuthController {
                 .orElseThrow(UserNotFoundException::new);
         refreshTokenService.deleteByUserId(user.getUserId());
         if(!user.getActive()){
-            return ResponseEntity.badRequest().body(new MessageResponse("User set to inactive, please contact support"));
+            user.setActive(true);
+            user.setDeletionDate(null);
+            userRepository.save(user);
         }
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

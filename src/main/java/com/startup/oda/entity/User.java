@@ -23,6 +23,8 @@ public class User {
     private String password;
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
+    @Column(name = "deletion_date")
+    private LocalDate deletionDate;
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private RoleEnum role;
@@ -34,6 +36,12 @@ public class User {
     private final LocalDate registrationDate = LocalDate.now();
     @Column(name = "phone")
     private String phone;
+    @Column(name = "bio")
+    private String bio;
+    @Column(name = "first_name")
+    private String firstName;
+    @Column(name = "last_name")
+    private String lastName;
 
 
     public User() {
@@ -107,6 +115,38 @@ public class User {
         this.phone = phone;
     }
 
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public LocalDate getDeletionDate() {
+        return deletionDate;
+    }
+
+    public void setDeletionDate(LocalDate deletionDate) {
+        this.deletionDate = deletionDate;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -114,11 +154,15 @@ public class User {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", isActive=" + isActive +
+                ", deletionDate=" + deletionDate +
                 ", role=" + role +
                 ", isVerified=" + isVerified +
                 ", reviews=" + reviews +
                 ", registrationDate=" + registrationDate +
                 ", phone='" + phone + '\'' +
+                ", bio='" + bio + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 '}';
     }
 }
