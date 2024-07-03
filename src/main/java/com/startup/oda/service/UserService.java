@@ -1,11 +1,14 @@
 package com.startup.oda.service;
 
 import com.startup.oda.config.LogEntryExit;
+import com.startup.oda.dto.request.ProfileUpdateRequest;
+import com.startup.oda.dto.response.ProfileUpdateResponse;
 import com.startup.oda.dto.response.UserProfileDto;
 import com.startup.oda.entity.User;
 import com.startup.oda.exception.exceptionsList.UserNotFoundException;
 import com.startup.oda.repository.UserRepository;
 import com.startup.oda.security.jwt.RefreshTokenService;
+import com.startup.oda.utils.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -28,30 +31,23 @@ public class UserService {
     }
 
     public UserProfileDto getProfile(String email) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isEmpty()){
-            throw new UserNotFoundException();
-        }
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+
         return new UserProfileDto(
-                userOptional.get().getFirstName(),
-                userOptional.get().getLastName(),
-                userOptional.get().getEmail(),
-                userOptional.get().getVerified(),
-                userOptional.get().getBio()
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getVerified(),
+                user.getBio()
         );
     }
-    public ResponseEntity<?> deleteUser(String email) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isEmpty()){
-            throw new UserNotFoundException();
-        }
-        User user = userOptional.get();
+    public void deleteUser(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
         user.setDeletionDate(LocalDate.now().plusDays(30));
         user.setActive(false);
         userRepository.save(user);
         LOGGER.info("User with email {} is being deleted", email);
         refreshTokenService.deleteByUserId(user.getUserId());
-        return ResponseEntity.ok("User with email " + email + "is being deleted");
     }
     @LogEntryExit
     @Scheduled(cron = "0 0 * * *")
@@ -60,5 +56,32 @@ public class UserService {
         List<User> usersToDelete = userRepository.findByIsActiveFalseAndDeletionDateBefore(now);
         userRepository.deleteAll(usersToDelete);
         LOGGER.info("Performed users permanent deletion");
+    }
+
+    public ProfileUpdateResponse updateProfile(String email, ProfileUpdateRequest request) {
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+
+        if (Validation.isValidFirstName(request.getFirstName())){
+            user.setFirstName(request.getFirstName());
+        }
+
+        if (Validation.isValidLastName(request.getLastName())){
+            user.setLastName(request.getLastName());
+        }
+
+        if (Validation.isValidInfo(request.getBio())){
+            user.setBio(request.getBio());
+        }
+
+        if (Validation.isValidPhone(request.getPhone())){
+            user.setPhone(request.getPhone());
+        }
+
+        return new ProfileUpdateResponse(
+                user.getFirstName(),
+                user.getLastName(),
+                user.getPhone(),
+                user.getBio()
+        );
     }
 }

@@ -60,7 +60,7 @@ public class RegisterService {
         try {
             JwtResponse jwt = createJwt(request.getEmail(), request.getRole(), user.getUserId());
             log.info("Created JWT for Agent");
-            mailService.sendMail(request.getEmail(), jwt.getAccessToken());
+//            mailService.sendMail(request.getEmail(), jwt.getAccessToken());
             return ResponseEntity.ok(jwt);
         } catch (Exception e){
             log.error("Error creating JWT for Agent");
@@ -80,7 +80,7 @@ public class RegisterService {
         try {
             JwtResponse jwt = createJwt(request.getEmail(), request.getRole(), user.getUserId());
             log.info("Created JWT for Client");
-            mailService.sendMail(request.getEmail(), jwt.getAccessToken());
+//            mailService.sendMail(request.getEmail(), jwt.getAccessToken());
             return ResponseEntity.ok(jwt);
         } catch (Exception e){
             log.error("Error creating JWT for Client");
@@ -101,7 +101,7 @@ public class RegisterService {
         try {
             JwtResponse jwt = createJwt(request.getEmail(), request.getRole(), user.getUserId());
             log.info("Created JWT for Owner");
-            mailService.sendMail(request.getEmail(), jwt.getAccessToken());
+//            mailService.sendMail(request.getEmail(), jwt.getAccessToken());
             return ResponseEntity.ok(jwt);
         } catch (Exception e){
             log.error("Error creating JWT for Owner");

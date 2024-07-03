@@ -7,6 +7,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Validation {
+    public static boolean isValidPhone(String phone) {
+        String regex = "^\\d{1,13}$";
+        if (phone == null || phone.isEmpty()){
+            return false;
+        }
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(phone);
+        if (!matcher.matches()) {
+            throw new InvalidInputException();
+        }
+
+        return true;
+    }
     public static boolean isValidEmail(String email) {
         String regex = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
                 + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
