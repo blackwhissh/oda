@@ -16,8 +16,7 @@ public class FileData {
     public FileData() {
     }
 
-    public FileData(Long id, String name, String type, String path) {
-        this.id = id;
+    public FileData(String name, String type, String path) {
         this.name = name;
         this.type = type;
         this.path = path;

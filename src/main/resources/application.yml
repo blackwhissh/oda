@@ -25,6 +25,12 @@ server:
     include-message: always
 jwt:
   key: ${JWT_KEY}
+
+aws:
+  s3:
+    bucket: oda-dev-bucket
+    access-key: AKIAZQ3DPQOBO5RQJYFO
+    secret-key: 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
 ---
 spring:
   config:

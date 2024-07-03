@@ -65,13 +65,20 @@ public class GlobalExceptionHandler {
         response.setMessage("Error while uploading image");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
-
     @ExceptionHandler(ImageNotFoundException.class)
     public ResponseEntity<Object> handleImageNotFoundException(ImageNotFoundException e) {
         ExceptionResponse response = new ExceptionResponse();
         response.setDateTime(LocalDateTime.now());
         response.setMessage("Image not found");
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(WrongProfileImageType.class)
+    public ResponseEntity<Object> handleWrongProfileImageType(WrongProfileImageType e) {
+        ExceptionResponse response = new ExceptionResponse();
+        response.setDateTime(LocalDateTime.now());
+        response.setMessage("Wrong profile image type, it should be JPEG or PNG");
+        return new ResponseEntity<>(response, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
     }
 
 

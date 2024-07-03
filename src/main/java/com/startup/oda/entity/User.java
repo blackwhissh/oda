@@ -43,8 +43,7 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
     @OneToOne
-    private ImageData image;
-
+    private FileData fileData;
 
     public User() {
     }
@@ -149,12 +148,12 @@ public class User {
         this.deletionDate = deletionDate;
     }
 
-    public ImageData getImage() {
-        return image;
+    public FileData getFileData() {
+        return fileData;
     }
 
-    public void setImage(ImageData image) {
-        this.image = image;
+    public void setFileData(FileData fileData) {
+        this.fileData = fileData;
     }
 
     @Override
