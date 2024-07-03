@@ -42,6 +42,8 @@ public class User {
     private String firstName;
     @Column(name = "last_name")
     private String lastName;
+    @OneToOne
+    private ImageData image;
 
 
     public User() {
@@ -145,6 +147,14 @@ public class User {
 
     public void setDeletionDate(LocalDate deletionDate) {
         this.deletionDate = deletionDate;
+    }
+
+    public ImageData getImage() {
+        return image;
+    }
+
+    public void setImage(ImageData image) {
+        this.image = image;
     }
 
     @Override

@@ -11,13 +11,11 @@ import com.startup.oda.security.jwt.RefreshTokenService;
 import com.startup.oda.utils.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -38,8 +36,7 @@ public class UserService {
                 user.getLastName(),
                 user.getEmail(),
                 user.getVerified(),
-                user.getBio()
-        );
+                user.getBio());
     }
     public void deleteUser(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);

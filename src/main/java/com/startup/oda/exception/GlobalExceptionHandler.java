@@ -47,15 +47,31 @@ public class GlobalExceptionHandler {
         ExceptionResponse response = new ExceptionResponse();
         response.setDateTime(LocalDateTime.now());
         response.setMessage("Invalid input");
-        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(WrongRoleException.class)
-    public ResponseEntity<Object> handleIWrongRoleException(WrongRoleException e) {
+    public ResponseEntity<Object> handleWrongRoleException(WrongRoleException e) {
         ExceptionResponse response = new ExceptionResponse();
         response.setDateTime(LocalDateTime.now());
         response.setMessage("Invalid role");
         return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @ExceptionHandler(ImageUploadException.class)
+    public ResponseEntity<Object> handleImageUploadException(ImageUploadException e) {
+        ExceptionResponse response = new ExceptionResponse();
+        response.setDateTime(LocalDateTime.now());
+        response.setMessage("Error while uploading image");
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ImageNotFoundException.class)
+    public ResponseEntity<Object> handleImageNotFoundException(ImageNotFoundException e) {
+        ExceptionResponse response = new ExceptionResponse();
+        response.setDateTime(LocalDateTime.now());
+        response.setMessage("Image not found");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
 
