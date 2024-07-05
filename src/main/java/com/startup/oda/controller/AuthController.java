@@ -14,6 +14,7 @@ import com.startup.oda.repository.UserRepository;
 import com.startup.oda.security.ApplicationUser;
 import com.startup.oda.security.jwt.JwtUtils;
 import com.startup.oda.security.jwt.RefreshTokenService;
+import com.startup.oda.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,20 +32,24 @@ public class AuthController {
     private final JwtUtils jwtUtils;
     private final UserRepository userRepository;
     private final RefreshTokenService refreshTokenService;
+    private final UserService userService;
+
     @Autowired
-    public AuthController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserRepository userRepository, RefreshTokenService refreshTokenService) {
+    public AuthController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserRepository userRepository, RefreshTokenService refreshTokenService, UserService userService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.userRepository = userRepository;
         this.refreshTokenService = refreshTokenService;
+        this.userService = userService;
     }
+
     @PostMapping("/login")
     @LogEntryExit()
-    public ResponseEntity<?> authenticateUser(@RequestBody SignInRequest signInRequest){
+    public ResponseEntity<?> authenticateUser(@RequestBody SignInRequest signInRequest) {
         User user = userRepository.findByEmail(signInRequest.getEmail())
                 .orElseThrow(UserNotFoundException::new);
         refreshTokenService.deleteByUserId(user.getUserId());
-        if(!user.getActive()){
+        if (!user.getActive()) {
             user.setActive(true);
             user.setDeletionDate(null);
             userRepository.save(user);
@@ -68,9 +73,10 @@ public class AuthController {
                 applicationUser.getAuthorities().stream().findFirst().get().toString()
         ));
     }
+
     @PostMapping("/refreshtoken")
     @LogEntryExit()
-    public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request){
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
 
         return refreshTokenService.findByToken(requestRefreshToken)
@@ -82,6 +88,7 @@ public class AuthController {
                 })
                 .orElseThrow(RefreshTokenNotFoundException::new);
     }
+
     @PostMapping("/logout")
     @LogEntryExit()
     public ResponseEntity<?> logoutUser() {
@@ -95,10 +102,11 @@ public class AuthController {
 
     @GetMapping("/verify/{token}")
     @LogEntryExit
-    public ResponseEntity<?> verify(@PathVariable(name = "token") String token){
-        if (jwtUtils.validateJwtToken(token)){
-            return ResponseEntity.ok("Email verified successfully");
-        }else {
+    public ResponseEntity<?> verify(@PathVariable(name = "token") String token) {
+        if (jwtUtils.validateMailToken(token)) {
+            userService.verifyUser(jwtUtils.getUsernameFromMailToken(token));
+            return ResponseEntity.ok("User verified successfully");
+        } else {
             return ResponseEntity.badRequest().body("Wrong token");
         }
     }

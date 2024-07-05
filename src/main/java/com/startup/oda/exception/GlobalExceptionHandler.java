@@ -74,5 +74,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(VerificationErrorException.class)
+    public ResponseEntity<Object> handleVerificationErrorException(VerificationErrorException e) {
+        ExceptionResponse response = new ExceptionResponse();
+        response.setDateTime(LocalDateTime.now());
+        response.setMessage("Email verification went wrong");
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
 
 }

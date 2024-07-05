@@ -21,6 +21,8 @@ public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
     @Value("${jwt.key}")
     private String jwtSecret;
+    @Value("${brevo.mail.secret}")
+    private String mailSecret;
 
     public String generateJwtToken(String username, RoleEnum role) {
         Instant now = Instant.now();
@@ -57,7 +59,41 @@ public class JwtUtils {
         }
         return false;
     }
+    public String generateMailToken(String email){
+        String jwtExpirationMs = "600000";
+        Instant expirationTime = Instant.now().plusMillis(Long.parseLong(jwtExpirationMs));
+        Date expirationDate = Date.from(expirationTime);
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(expirationDate)
+                .signWith(mailKey())
+                .compact();
+    }
+    public boolean validateMailToken(String mailToken){
+        try {
+            Jwts.parserBuilder().setSigningKey(mailKey()).build().parse(mailToken);
+            logger.info("Email verified successfully");
+            return true;
+        } catch (ExpiredJwtException e) {
+            logger.error("Mail token is expired: {}", e.getMessage());
+        } catch (SignatureException e) {
+            logger.error("Invalid Mail signature: {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            logger.error("Invalid Mail token: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            logger.error("Mail token is unsupported: {}", e.getMessage());
+        }
+        return false;
+    }
+    public String getUsernameFromMailToken(String token) {
+        return Jwts.parserBuilder().setSigningKey(mailKey()).build()
+                .parseClaimsJws(token).getBody().getSubject();
+    }
     private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+    }
+    private Key mailKey(){
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(mailSecret));
     }
 }

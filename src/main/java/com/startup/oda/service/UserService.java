@@ -6,6 +6,7 @@ import com.startup.oda.dto.response.ProfileUpdateResponse;
 import com.startup.oda.dto.response.UserProfileDto;
 import com.startup.oda.entity.User;
 import com.startup.oda.exception.exceptionsList.UserNotFoundException;
+import com.startup.oda.exception.exceptionsList.VerificationErrorException;
 import com.startup.oda.repository.UserRepository;
 import com.startup.oda.security.jwt.RefreshTokenService;
 import com.startup.oda.utils.Validation;
@@ -31,13 +32,9 @@ public class UserService {
     public UserProfileDto getProfile(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
 
-        return new UserProfileDto(
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getVerified(),
-                user.getBio());
+        return new UserProfileDto(user.getFirstName(), user.getLastName(), user.getEmail(), user.getVerified(), user.getBio());
     }
+
     public void deleteUser(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
         user.setDeletionDate(LocalDate.now().plusDays(30));
@@ -46,9 +43,10 @@ public class UserService {
         LOGGER.info("User with email {} is being deleted", email);
         refreshTokenService.deleteByUserId(user.getUserId());
     }
+
     @LogEntryExit
     @Scheduled(cron = "0 0 * * *")
-    public void deleteUsersPermanently(){
+    public void deleteUsersPermanently() {
         LocalDate now = LocalDate.now();
         List<User> usersToDelete = userRepository.findByIsActiveFalseAndDeletionDateBefore(now);
         userRepository.deleteAll(usersToDelete);
@@ -58,27 +56,34 @@ public class UserService {
     public ProfileUpdateResponse updateProfile(String email, ProfileUpdateRequest request) {
         User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
 
-        if (Validation.isValidFirstName(request.getFirstName())){
+        if (Validation.isValidFirstName(request.getFirstName())) {
             user.setFirstName(request.getFirstName());
         }
 
-        if (Validation.isValidLastName(request.getLastName())){
+        if (Validation.isValidLastName(request.getLastName())) {
             user.setLastName(request.getLastName());
         }
 
-        if (Validation.isValidInfo(request.getBio())){
+        if (Validation.isValidInfo(request.getBio())) {
             user.setBio(request.getBio());
         }
 
-        if (Validation.isValidPhone(request.getPhone())){
+        if (Validation.isValidPhone(request.getPhone())) {
             user.setPhone(request.getPhone());
         }
 
-        return new ProfileUpdateResponse(
-                user.getFirstName(),
-                user.getLastName(),
-                user.getPhone(),
-                user.getBio()
-        );
+        return new ProfileUpdateResponse(user.getFirstName(), user.getLastName(), user.getPhone(), user.getBio());
+    }
+
+    public void verifyUser(String email) {
+        try {
+            User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+            user.setVerified(true);
+            userRepository.save(user);
+            LOGGER.info("User with email " + email + " set to verified");
+        } catch (RuntimeException e) {
+            LOGGER.error("Error while verifying user with email " + email);
+            throw new VerificationErrorException();
+        }
     }
 }

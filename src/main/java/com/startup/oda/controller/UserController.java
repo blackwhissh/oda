@@ -57,13 +57,13 @@ public class UserController {
             return ResponseEntity.badRequest().body("Something unexpected happened");
         }
     }
-    @PostMapping("/upload-image")
+    @PostMapping("/upload-profile-image")
     public ResponseEntity<?> uploadImage(@AuthenticationPrincipal String email,
                                          @RequestParam(name = "image") MultipartFile file) throws IOException {
         return ResponseEntity.ok(imageService.uploadUserImage(email, file));
     }
 
-    @GetMapping("/user-image")
+    @GetMapping("/profile-image")
     public ResponseEntity<?> getUserImage(@AuthenticationPrincipal String email){
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.valueOf("image/png"))

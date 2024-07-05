@@ -16,9 +16,16 @@ spring:
     username: postgres
     password: 12345678
     driver-class-name: org.postgresql.Driver
+#  mail:
+#    host: localhost
+#    port: 25
+brevo:
   mail:
-    host: localhost
-    port: 25
+    username: ${BREVO_MAIL_USERNAME}
+    password: ${BREVO_MAIL_PASSWORD}
+    host: smtp-relay.sendinblue.com
+    port: 587
+    secret: ${BREVO_MAIL_SECRET}
 server:
   port: 8081
   error:
@@ -55,4 +62,4 @@ spring:
 ---
 spring:
   profiles:
-    active: ${ACTIVE_PROFILE}
+    active: test

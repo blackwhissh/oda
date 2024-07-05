@@ -30,13 +30,10 @@ public class RegisterService {
     private final OwnerRepository ownerRepository;
     private final RefreshTokenService refreshTokenService;
     private final JwtUtils jwtUtils;
-    private final MailService mailService;
+    private final BrevoMailService mailService;
 
     @Autowired
-    public RegisterService(UserRepository userRepository,
-                           AgentRepository agentRepository,
-                           ClientRepository clientRepository,
-                           OwnerRepository ownerRepository, RefreshTokenService refreshTokenService, JwtUtils jwtUtils, MailService mailService) {
+    public RegisterService(UserRepository userRepository, AgentRepository agentRepository, ClientRepository clientRepository, OwnerRepository ownerRepository, RefreshTokenService refreshTokenService, JwtUtils jwtUtils, BrevoMailService mailService) {
         this.userRepository = userRepository;
         this.agentRepository = agentRepository;
         this.clientRepository = clientRepository;
@@ -45,9 +42,10 @@ public class RegisterService {
         this.jwtUtils = jwtUtils;
         this.mailService = mailService;
     }
-    public ResponseEntity<?> registerAgent(RegisterRequest request){
+
+    public ResponseEntity<?> registerAgent(RegisterRequest request) {
         User user = createUser(request);
-        if(user == null){
+        if (user == null) {
             return ResponseEntity.badRequest().body(new MessageResponse("Email is already registered!"));
         }
 
@@ -60,16 +58,17 @@ public class RegisterService {
         try {
             JwtResponse jwt = createJwt(request.getEmail(), request.getRole(), user.getUserId());
             log.info("Created JWT for Agent");
-//            mailService.sendMail(request.getEmail(), jwt.getAccessToken());
+            mailService.sendMail(request.getEmail(), createMailToken(request.getEmail()));
             return ResponseEntity.ok(jwt);
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Error creating JWT for Agent");
             throw new JwtException(e.getMessage());
         }
     }
-    public ResponseEntity<?> registerClient(RegisterRequest request){
+
+    public ResponseEntity<?> registerClient(RegisterRequest request) {
         User user = createUser(request);
-        if(user == null){
+        if (user == null) {
             return ResponseEntity.badRequest().body(new MessageResponse("Email is already registered!"));
         }
 
@@ -80,17 +79,17 @@ public class RegisterService {
         try {
             JwtResponse jwt = createJwt(request.getEmail(), request.getRole(), user.getUserId());
             log.info("Created JWT for Client");
-//            mailService.sendMail(request.getEmail(), jwt.getAccessToken());
+            mailService.sendMail(request.getEmail(), createMailToken(request.getEmail()));
             return ResponseEntity.ok(jwt);
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Error creating JWT for Client");
             throw new JwtException(e.getMessage());
         }
     }
 
-    public ResponseEntity<?> registerOwner(RegisterRequest request){
+    public ResponseEntity<?> registerOwner(RegisterRequest request) {
         User user = createUser(request);
-        if(user == null){
+        if (user == null) {
             return ResponseEntity.badRequest().body(new MessageResponse("Email is already registered!"));
         }
 
@@ -101,16 +100,16 @@ public class RegisterService {
         try {
             JwtResponse jwt = createJwt(request.getEmail(), request.getRole(), user.getUserId());
             log.info("Created JWT for Owner");
-//            mailService.sendMail(request.getEmail(), jwt.getAccessToken());
+            mailService.sendMail(request.getEmail(), createMailToken(request.getEmail()));
             return ResponseEntity.ok(jwt);
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Error creating JWT for Owner");
             throw new JwtException(e.getMessage());
         }
     }
 
     private User createUser(RegisterRequest request) {
-        if(userRepository.existsByEmailAndIsActive(request.getEmail(), true)){
+        if (userRepository.existsByEmailAndIsActive(request.getEmail(), true)) {
             return null;
         }
         User user = new User();
@@ -122,22 +121,20 @@ public class RegisterService {
         user.setPassword(PasswordConfig.passwordEncoder().encode(request.getPassword()));
         user.setRole(RoleEnum.valueOf(request.getRole().toUpperCase()));
         user.setActive(true);
-        user.setVerified(true);
+        user.setVerified(false);
         userRepository.save(user);
 
         return user;
     }
 
-    private JwtResponse createJwt(String email, String role, Long userId){
+    private JwtResponse createJwt(String email, String role, Long userId) {
         String accessToken = jwtUtils.generateJwtToken(email, RoleEnum.valueOf(role.toUpperCase()));
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(email);
         String userRole = "ROLE_" + role.toUpperCase();
-        return new JwtResponse(
-                accessToken,
-                refreshToken.getToken(),
-                userId,
-                email,
-                userRole
-        );
+        return new JwtResponse(accessToken, refreshToken.getToken(), userId, email, userRole);
+    }
+
+    private String createMailToken(String email) {
+        return jwtUtils.generateMailToken(email);
     }
 }
