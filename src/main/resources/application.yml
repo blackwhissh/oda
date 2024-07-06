@@ -16,9 +16,6 @@ spring:
     username: postgres
     password: 12345678
     driver-class-name: org.postgresql.Driver
-#  mail:
-#    host: localhost
-#    port: 25
 brevo:
   mail:
     username: ${BREVO_MAIL_USERNAME}

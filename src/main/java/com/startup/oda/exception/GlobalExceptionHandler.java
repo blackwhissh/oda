@@ -82,5 +82,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(UserNotVerifiedException.class)
+    public ResponseEntity<Object> handleUserNotVerifiedException(UserNotVerifiedException e) {
+        ExceptionResponse response = new ExceptionResponse();
+        response.setDateTime(LocalDateTime.now());
+        response.setMessage("User is not verified");
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
 
 }

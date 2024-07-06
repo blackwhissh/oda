@@ -1,5 +1,7 @@
 package com.startup.oda.controller;
 
+import com.startup.oda.config.LogEntryExit;
+import com.startup.oda.config.VerifiedUser;
 import com.startup.oda.dto.request.PasswordUpdateRequest;
 import com.startup.oda.dto.request.ProfileUpdateRequest;
 import com.startup.oda.service.ImageService;
@@ -30,23 +32,26 @@ public class UserController {
         this.userService = userService;
         this.imageService = imageService;
     }
-
+    @VerifiedUser
+    @LogEntryExit
     @PutMapping(path = "/update-password")
     public ResponseEntity<?> updatePassword(@AuthenticationPrincipal String email,
                                             @RequestBody PasswordUpdateRequest request){
         return passwordService.updatePassword(email, request);
     }
+    @VerifiedUser
+    @LogEntryExit
     @PatchMapping(path = "/update-profile")
     public ResponseEntity<?> updateProfile(@AuthenticationPrincipal String email,
                                            @RequestBody ProfileUpdateRequest request){
         return ResponseEntity.ok(userService.updateProfile(email, request));
     }
-
+    @LogEntryExit
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(@AuthenticationPrincipal String email){
         return ResponseEntity.ok(userService.getProfile(email));
     }
-
+    @LogEntryExit
     @PatchMapping("/delete")
     public ResponseEntity<?> deleteUser(@AuthenticationPrincipal String email){
         try {
@@ -57,12 +62,14 @@ public class UserController {
             return ResponseEntity.badRequest().body("Something unexpected happened");
         }
     }
+    @VerifiedUser
+    @LogEntryExit
     @PostMapping("/upload-profile-image")
     public ResponseEntity<?> uploadImage(@AuthenticationPrincipal String email,
                                          @RequestParam(name = "image") MultipartFile file) throws IOException {
         return ResponseEntity.ok(imageService.uploadUserImage(email, file));
     }
-
+    @LogEntryExit
     @GetMapping("/profile-image")
     public ResponseEntity<?> getUserImage(@AuthenticationPrincipal String email){
         return ResponseEntity.status(HttpStatus.OK)
